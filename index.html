@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruslan - Charakterbogen</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- HEADER -->
+  <header class="character-header">
+    <div class="name-box long-press-edit" data-stat-text="Name">
+      <h1>Ruslan (Kopie)</h1>
+    </div>
+    <div class="level-circle">
+      <span>Stufe</span>
+      <div class="editable" data-stat-id="Stufe" style="background:transparent; min-width:auto; padding:0; margin-top:5px;"></div>
+    </div>
+  </header>
+
+  <!-- PERSONENDATEN -->
+  <details class="section-card" open>
+    <summary>
+      <h2>Personendaten</h2>
+      <span class="chevron"></span>
+    </summary>
+    <div class="section-content grid-2">
+      <div class="column">
+        <div class="data-row long-press-edit" data-stat-text="Rasse">
+          <span class="data-label">Rasse</span>
+          <span class="data-value">Thorwaler</span>
+        </div>
+        <div class="data-row long-press-edit" data-stat-text="Kultur">
+          <span class="data-label">Kultur</span>
+          <span class="data-value">Thorwal</span>
+        </div>
+        <div class="data-row long-press-edit" data-stat-text="Profession">
+          <span class="data-label">Profession</span>
+          <span class="data-value">Seefahrer, Pirat</span>
+        </div>
+      </div>
+      <div class="column">
+        <h3 style="color:var(--accent-gold); font-size: 0.9rem; margin-bottom: 5px;">Abenteuerpunkte</h3>
+        <div class="header-row" style="margin-bottom:10px; border:none; padding:0;">
+          <button class="btn-primary" style="font-size:0.7rem; padding:4px 8px;" onclick="openAPModal('add')">AP erhalten</button>
+          <button class="btn-secondary" style="font-size:0.7rem; padding:4px 8px;" onclick="openAPModal('spend')">AP ausgeben</button>
+        </div>
+        <div class="data-row">
+          <span class="data-label">AP Gesamt</span>
+          <span class="data-value" id="disp-ap-gesamt"></span>
+        </div>
+        <div class="data-row">
+          <span class="data-label">AP verfügbar</span>
+          <div class="formula-calc" data-formula="AP_CALC" style="font-weight:bold; color:var(--accent-gold);"></div>
+        </div>
+        <div class="data-row">
+          <span class="data-label">AP eingesetzt</span>
+          <span class="data-value" id="disp-ap-eingesetzt"></span>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- BESCHREIBUNG -->
+  <!-- We skip long-press edit for now on these unless explicitly asked, to keep it simple -->
+  <details class="section-card">
+    <summary>
+      <h2>Beschreibung</h2>
+      <span class="chevron"></span>
+    </summary>
+    <div class="section-content grid-2">
+      <div class="column">
+        <div class="data-row"><span class="data-label">Geschlecht</span> <span class="data-value">männlich</span></div>
+        <div class="data-row"><span class="data-label">Geburtstag</span> <span class="data-value">13. Phex 1003 BF</span></div>
+        <div class="data-row"><span class="data-label">Größe</span> <span class="data-value">190 HF</span></div>
+        <div class="data-row"><span class="data-label">Gewicht</span> <span class="data-value">95 ST</span></div>
+        <div class="data-row"><span class="data-label">Haarfarbe</span> <span class="data-value">rotblond</span></div>
+        <div class="data-row"><span class="data-label">Augenfarbe</span> <span class="data-value">blau</span></div>
+        <div class="data-row"><span class="data-label">Aussehen</span> <span class="data-value">-</span></div>
+      </div>
+      <div class="column">
+        <div class="data-row"><span class="data-label">Stand</span> <span class="data-value">-</span></div>
+        <div class="data-row"><span class="data-label">Titel</span> <span class="data-value">-</span></div>
+        <div class="data-row"><span class="data-label">Sozialstatus</span> <span class="data-value">1</span></div>
+        <div class="data-row"><span class="data-label">Herkunft</span> <span class="data-value">-</span></div>
+      </div>
+    </div>
+  </details>
+
+  <!-- EIGENSCHAFTEN UND BASISWERTE -->
+  <details class="section-card" open>
+    <summary>
+      <h2>Eigenschaften & Basiswerte</h2>
+      <span class="chevron"></span>
+    </summary>
+    <div class="section-content grid-2">
+      <div class="column">
+        <div class="header-row">
+          <h3>Eigenschaften</h3>
+          <button class="add-btn" data-modal="eigenschaften">+</button>
+        </div>
+        <div class="data-row"><span class="data-label">Charisma (CH)</span> <div class="editable" data-stat-id="CH"></div></div>
+        <div class="data-row"><span class="data-label">Fingerfertigkeit (FF)</span> <div class="editable" data-stat-id="FF"></div></div>
+        <div class="data-row"><span class="data-label">Geschwindigkeit (GS)</span> <div class="editable" data-stat-id="GS"></div></div>
+        <div class="data-row"><span class="data-label">Gewandtheit (GE)</span> <div class="editable" data-stat-id="GE"></div></div>
+        <div class="data-row"><span class="data-label">Intuition (IN)</span> <div class="editable" data-stat-id="IN"></div></div>
+        <div class="data-row"><span class="data-label">Klugheit (KL)</span> <div class="editable" data-stat-id="KL"></div></div>
+        <div class="data-row"><span class="data-label">Konstitution (KO)</span> <div class="editable" data-stat-id="KO"></div></div>
+        <div class="data-row"><span class="data-label">Körperkraft (KK)</span> <div class="editable" data-stat-id="KK"></div></div>
+        <div class="data-row"><span class="data-label">Mut (MU)</span> <div class="editable" data-stat-id="MU"></div></div>
+        <div class="data-row" style="margin-top: 15px;">
+          <span class="data-label" style="color:var(--accent-red)">Rüstungsbehinderung (BE)</span> 
+          <span class="data-value" id="disp-be" style="font-weight:bold; color:var(--accent-gold);"></span>
+        </div>
+        <div id="custom-eigenschaften"></div>
+      </div>
+      <div class="column">
+        <div class="header-row">
+          <h3>Basiswerte</h3>
+          <button class="add-btn" data-modal="basiswerte">+</button>
+        </div>
+        <div class="data-row"><span class="data-label">Lebensenergie (LE)</span> <div class="editable" data-stat-id="LE"></div></div>
+        <div class="data-row"><span class="data-label">Ausdauer (AU)</span> <div class="editable" data-stat-id="AU"></div></div>
+        <div class="data-row"><span class="data-label">Astralenergie (AE)</span> <div class="editable" data-stat-id="AE"></div></div>
+        <div class="data-row"><span class="data-label">Karmaenergie (KE)</span> <span class="data-value">-</span></div>
+        <div class="data-row"><span class="data-label">Magieresistenz (MR)</span> <div class="editable" data-stat-id="MR"></div></div>
+        <div class="data-row"><span class="data-label">Initiative (INI)</span> <div class="editable" data-stat-id="INI"></div></div>
+        <div class="data-row"><span class="data-label">Attacke Basis (AT)</span> <div class="editable" data-stat-id="AT_Basis"></div></div>
+        <div class="data-row"><span class="data-label">Parade Basis (PA)</span> <div class="editable" data-stat-id="PA_Basis"></div></div>
+        <div class="data-row"><span class="data-label">Fernkampf Basis (FK)</span> <div class="editable" data-stat-id="FK_Basis"></div></div>
+        <div id="custom-basiswerte"></div>
+      </div>
+    </div>
+  </details>
+
+  <!-- TALENTE -->
+  <details class="section-card" open>
+    <summary>
+      <h2>Talente</h2>
+      <span class="chevron"></span>
+    </summary>
+    <div class="section-content grid-2">
+      
+      <!-- LEFT COL -->
+      <div class="column">
+        <!-- Gaben -->
+        <div class="talent-group">
+          <div class="header-row">
+            <h3>Gaben (G)</h3>
+            <button class="add-btn" data-modal="talent_gabe">+</button>
+          </div>
+          <div class="talent-row" style="font-weight:bold; color:var(--text-secondary); font-size:0.8rem; border:none; padding-bottom:0;">
+            <span>Talent</span><span>Probe</span><span style="text-align:right">TaW</span>
+          </div>
+
+          <div id="custom-talent_gabe"></div>
+        </div>
+
+        <!-- Kampftechniken -->
+        <div class="talent-group">
+          <div class="header-row">
+            <h3>Kampftechniken</h3>
+            <button class="add-btn" data-modal="kampftechniken">+</button>
+          </div>
+          <div class="talent-row kampf-row" style="font-weight:bold; color:var(--text-secondary); font-size:0.8rem; border:none; padding-bottom:0;">
+            <span>Talent</span><span>BE</span><span>AT</span><span>PA</span><span style="text-align:right">TaW</span>
+          </div>
+
+          <div id="custom-kampftechniken"></div>
+        </div>
+
+        <!-- Körperliche Talente -->
+        <div class="talent-group">
+          <div class="header-row">
+            <h3>Körperliche Talente</h3>
+            <button class="add-btn" data-modal="talent_koerper">+</button>
+          </div>
+          <div class="talent-row" style="font-weight:bold; color:var(--text-secondary); font-size:0.8rem; border:none; padding-bottom:0;">
+            <span>Talent</span><span>Probe / BE</span><span style="text-align:right">TaW</span>
+          </div>
+
+          <div id="custom-talent_koerper"></div>
+        </div>
+
+        <!-- Gesellschaftliche Talente -->
+        <div class="talent-group">
+          <div class="header-row">
+            <h3>Gesellschaftliche Talente</h3>
+            <button class="add-btn" data-modal="talent_gesellschaft">+</button>
+          </div>
+          <div class="talent-row" style="font-weight:bold; color:var(--text-secondary); font-size:0.8rem; border:none; padding-bottom:0;">
+            <span>Talent</span><span>Probe</span><span style="text-align:right">TaW</span>
+          </div>
+
+          <div id="custom-talent_gesellschaft"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT COL -->
+      <div class="column">
+        <!-- Naturtalente -->
+        <div class="talent-group">
+          <div class="header-row">
+            <h3>Natur-Talente</h3>
+            <button class="add-btn" data-modal="talent_natur">+</button>
+          </div>
+          <div class="talent-row" style="font-weight:bold; color:var(--text-secondary); font-size:0.8rem; border:none; padding-bottom:0;">
+            <span>Talent</span><span>Probe</span><span style="text-align:right">TaW</span>
+          </div>
+
+          <div id="custom-talent_natur"></div>
+        </div>
+
+        <!-- Wissenstalente -->
+        <div class="talent-group">
+          <div class="header-row">
+            <h3>Wissenstalente</h3>
+            <button class="add-btn" data-modal="talent_wissen">+</button>
+          </div>
+          <div class="talent-row" style="font-weight:bold; color:var(--text-secondary); font-size:0.8rem; border:none; padding-bottom:0;">
+            <span>Talent</span><span>Probe</span><span style="text-align:right">TaW</span>
+          </div>
+
+          <div id="custom-talent_wissen"></div>
+        </div>
+
+        <!-- Sprachen / Schriften -->
+        <div class="talent-group">
+          <div class="header-row">
+            <h3>Sprachen</h3>
+            <button class="add-btn" data-modal="talent_sprachen">+</button>
+          </div>
+          <div class="talent-row" style="font-weight:bold; color:var(--text-secondary); font-size:0.8rem; border:none; padding-bottom:0;">
+            <span>Sprache</span><span>Komp.</span><span style="text-align:right">TaW</span>
+          </div>
+
+          <div id="custom-talent_sprachen"></div>
+        </div>
+
+        <!-- Handwerkliche Talente -->
+        <div class="talent-group">
+          <div class="header-row">
+            <h3>Handwerkliche Talente</h3>
+            <button class="add-btn" data-modal="talent_handwerk">+</button>
+          </div>
+          <div class="talent-row" style="font-weight:bold; color:var(--text-secondary); font-size:0.8rem; border:none; padding-bottom:0;">
+            <span>Talent</span><span>Probe</span><span style="text-align:right">TaW</span>
+          </div>
+
+          <div id="custom-talent_handwerk"></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- ZAUBER -->
+  <details class="section-card">
+    <summary>
+      <h2>Zauber</h2>
+      <span class="chevron"></span>
+    </summary>
+    <div class="section-content">
+      <div class="header-row">
+        <h3 style="color:transparent; height:1px;">.</h3>
+        <button class="add-btn" data-modal="zauber">+</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Zauber</th>
+            <th>Probe</th>
+            <th>ZfW</th>
+            <th>Rep / Merkmale</th>
+          </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+<tbody id="custom-zauber-container" style="display:contents"></tbody>
+      </table>
+    </div>
+  </details>
+
+  <!-- VORTEILE UND NACHTEILE -->
+  <details class="section-card">
+    <summary>
+      <h2>Vorteile und Nachteile</h2>
+      <span class="chevron"></span>
+    </summary>
+    <div class="section-content grid-2">
+      <div class="column">
+        <div class="header-row">
+          <h3>Vorteile</h3>
+          <button class="add-btn" data-modal="vorteile">+</button>
+        </div>
+        <div id="custom-vorteile-container" style="display:grid; gap:0;"></div>
+      </div>
+      <div class="column">
+        <div class="header-row">
+          <h3>Nachteile</h3>
+          <button class="add-btn" data-modal="nachteile">+</button>
+        </div>
+        <div id="custom-nachteile-container" style="display:grid; gap:0;"></div>
+      </div>
+    </div>
+  </details>
+
+  <!-- SONDERFERTIGKEITEN -->
+  <details class="section-card">
+    <summary>
+      <h2>Sonderfertigkeiten</h2>
+      <span class="chevron"></span>
+    </summary>
+    <div class="section-content column">
+      <div class="header-row">
+        <h3>Sonderfertigkeiten</h3>
+        <button class="add-btn" data-modal="sonderfertigkeiten">+</button>
+      </div>
+      <div id="custom-sonderfertigkeiten-container" style="display:grid; grid-template-columns:1fr 1fr; gap:0 10px;"></div>
+    </div>
+  </details>
+
+</div>
+
+<!-- MODAL CONTAINER -->
+<div id="modal-container"></div>
+
+<!-- INVENTORY MODAL STUB -->
+<div id="inventory-modal-container"></div>
+
+<!-- INVENTORY ICON -->
+<div id="inventory-icon" onclick="openInventoryModal()">
+  <img src="img/chest.svg" alt="Inventar">
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
