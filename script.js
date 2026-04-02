@@ -95,7 +95,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 { id: "I3", amount: 1, name: "Brosche" },
                 { id: "I4", amount: 1, name: "Angelhaken" }
             ]
-        }
+        },
+        openSections: ["Personendaten", "Eigenschaften & Basiswerte", "Talente"]
     };
 
     // Merge logic
@@ -105,6 +106,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     if (!savedData.geld) charData.geld = defaultData.geld;
     else charData.geld = { ...defaultData.geld, ...savedData.geld };
+
+    if (!savedData.openSections) charData.openSections = defaultData.openSections;
+    else charData.openSections = savedData.openSections;
 
     if (!savedData.customList) charData.customList = defaultData.customList;
     else {
@@ -303,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!wrapper.classList.contains("active")) {
                     document.querySelectorAll(".editable.active").forEach(el => el.classList.remove("active"));
                     wrapper.classList.add("active");
-                    input.focus();
+                    // No input.focus(); here, to prevent keyboard popup on first click.
                 }
             });
 
@@ -737,7 +741,7 @@ document.addEventListener("DOMContentLoaded", () => {
             wrapper.querySelector(".minus").onclick = (e) => { e.stopPropagation(); input.value = (parseInt(input.value) || 0) - 1; act(); updateDOM(); };
             wrapper.querySelector(".plus").onclick = (e) => { e.stopPropagation(); input.value = (parseInt(input.value) || 0) + 1; act(); updateDOM(); };
             input.onchange = act;
-            wrapper.onclick = () => { wrapper.classList.add("active"); input.focus(); };
+            wrapper.onclick = () => { wrapper.classList.add("active"); };
         });
         bindCustomItems();
     };
@@ -777,12 +781,10 @@ document.addEventListener("DOMContentLoaded", () => {
             };
             const cancelPress = () => { clearTimeout(universalPressTimer); };
 
-            el.addEventListener("mousedown", startPress);
-            el.addEventListener("touchstart", startPress);
-            el.addEventListener("mouseup", cancelPress);
-            el.addEventListener("mouseleave", cancelPress);
+            el.addEventListener("touchstart", startPress, { passive: true });
             el.addEventListener("touchend", cancelPress);
-            el.addEventListener("touchmove", cancelPress);
+            el.addEventListener("touchcancel", cancelPress);
+            el.addEventListener("touchmove", cancelPress, { passive: true });
         });
     }
 
@@ -790,14 +792,40 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".long-press-edit").forEach(el => {
         // Redefine precisely
         const textKey = el.getAttribute("data-stat-text");
-        el.onmousedown = el.ontouchstart = (e) => {
+        const startPress = (e) => {
             longPressTimer = setTimeout(() => {
                 openTextEditModal(textKey, charData.coreText[textKey]);
             }, 600); 
         };
-        el.onmouseup = el.onmouseleave = el.ontouchend = el.ontouchmove = () => {
-            clearTimeout(longPressTimer);
-        };
+        const cancelPress = () => { clearTimeout(longPressTimer); };
+        
+        el.addEventListener("touchstart", startPress, { passive: true });
+        el.addEventListener("touchend", cancelPress);
+        el.addEventListener("touchcancel", cancelPress);
+        el.addEventListener("touchmove", cancelPress, { passive: true });
+    });
+
+    // --- State Persistence for <details> Tags ---
+    document.querySelectorAll("details.section-card").forEach(details => {
+        const h2Info = details.querySelector("h2");
+        if (!h2Info) return;
+        const title = h2Info.innerText.trim();
+        
+        if (charData.openSections && charData.openSections.includes(title)) {
+            details.setAttribute("open", "");
+        } else {
+            details.removeAttribute("open");
+        }
+        
+        details.addEventListener("toggle", (e) => {
+            if (!charData.openSections) charData.openSections = [];
+            if (details.open) {
+                if (!charData.openSections.includes(title)) charData.openSections.push(title);
+            } else {
+                charData.openSections = charData.openSections.filter(t => t !== title);
+            }
+            saveData();
+        });
     });
 
     // --- On Init ---
