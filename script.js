@@ -392,11 +392,12 @@ document.addEventListener("DOMContentLoaded", () => {
         el.addEventListener("touchstart", startPress, { passive: true });
         el.addEventListener("touchend", cancelPress);
         el.addEventListener("touchcancel", cancelPress);
+        // CRITICAL FIX: Auch hier beim Scrollen abbrechen!
+        el.addEventListener("touchmove", cancelPress, { passive: true });
         
         // Verhindert das Standard-Menü des Tablets
         el.addEventListener("contextmenu", (e) => { e.preventDefault(); });
     });
-
 
     // --- 5. Calculators ---
     function updateProbes() {
@@ -690,13 +691,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const invData = charData.customList;
         const geld = charData.geld;
         
-let ausrHTML = invData.ausruestung.map((item, idx) => {
+        let ausrHTML = invData.ausruestung.map((item, idx) => {
             let stats = [];
             if(item.rs) stats.push(`RS: ${item.rs}`);
             if(item.be) stats.push(`BE: ${item.be}`);
             let statText = stats.length > 0 ? `<span style="font-size:0.7rem; color:var(--text-secondary); margin-left:5px;">(${stats.join(' | ')})</span>` : '';
             return `
-            <div class="inv-row" style="cursor:pointer;" onclick="closeInventoryModal(); openAddItemModal('ausruestung', ${idx});">
+            <div class="inv-row custom-item-bind" data-cat="ausruestung" data-idx="${idx}" style="cursor:pointer;">
                 <div style="flex:1;">
                     <strong>${item.name}</strong>
                     ${statText}
@@ -705,7 +706,7 @@ let ausrHTML = invData.ausruestung.map((item, idx) => {
         }).join('');
 
         let gegHTML = invData.gegenstaende.map((item, idx) => `
-            <div class="inv-row" style="cursor:pointer;" onclick="closeInventoryModal(); openAddItemModal('gegenstaende', ${idx});">
+            <div class="inv-row custom-item-bind" data-cat="gegenstaende" data-idx="${idx}" style="cursor:pointer;">
                 <div style="flex:1;">
                     <span style="color:var(--accent-gold); margin-right:5px;">${item.amount}x</span> 
                     <strong>${item.name}</strong>
@@ -713,7 +714,6 @@ let ausrHTML = invData.ausruestung.map((item, idx) => {
             </div>
         `).join('');
 
-        
         document.getElementById("inventory-modal-container").innerHTML = `
             <div class="modal-overlay active" style="z-index: 950; display:flex;">
                 <div class="inventory-card modal-card" style="margin: auto; max-height: 85vh;">
@@ -809,7 +809,7 @@ let universalPressTimer;
                         closeInventoryModal();
                     }
                     openAddItemModal(cat, idx);
-                }, 600); 
+                }, 500); // Leicht auf 500ms verkürzt, fühlt sich knackiger an
             };
             const cancelPress = () => { clearTimeout(universalPressTimer); };
 
@@ -820,11 +820,12 @@ let universalPressTimer;
             el.addEventListener("touchstart", startPress, { passive: true });
             el.addEventListener("touchend", cancelPress);
             el.addEventListener("touchcancel", cancelPress);
+            // CRITICAL FIX: Wenn gescrollt wird, sofort Timer abbrechen!
+            el.addEventListener("touchmove", cancelPress, { passive: true }); 
             
             el.addEventListener("contextmenu", (e) => { e.preventDefault(); });
         });
     }
-
 
     // --- State Persistence for <details> Tags ---
     document.querySelectorAll("details.section-card").forEach(details => {
