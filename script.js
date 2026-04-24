@@ -372,8 +372,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // --- 4. Long Press Edit Logic ---
-    let longPressTimer;
-    let startX = 0, startY = 0; // Toleranz-Speicher
+    let longPressTimer = null;
+    let startX = 0, startY = 0; 
 
     document.querySelectorAll(".long-press-edit").forEach(el => {
         const textKey = el.getAttribute("data-stat-text");
@@ -383,13 +383,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 startX = e.touches[0].clientX;
                 startY = e.touches[0].clientY;
             }
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+            }
             longPressTimer = setTimeout(() => {
                 openTextEditModal(textKey, charData.coreText[textKey]);
+                longPressTimer = null;
             }, 500); 
         }
         
         function cancelPress() {
-            clearTimeout(longPressTimer);
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
         }
 
         function checkMove(e) {
@@ -397,17 +404,15 @@ document.addEventListener("DOMContentLoaded", () => {
             if (e.touches && e.touches.length > 0) {
                 const dx = Math.abs(e.touches[0].clientX - startX);
                 const dy = Math.abs(e.touches[0].clientY - startY);
-                // Erst abbrechen, wenn weiter als 10 Pixel gescrollt wird
-                if (dx > 10 || dy > 10) cancelPress();
+                if (dx > 10 || dy > 10) {
+                    cancelPress();
+                }
             } else {
                 cancelPress();
             }
         }
 
-        el.addEventListener("mousedown", startPress);
-        el.addEventListener("mouseup", cancelPress);
-        el.addEventListener("mouseleave", cancelPress);
-
+        // NUR NOCH TOUCH EVENTS - Maus-Steuerung komplett entfernt!
         el.addEventListener("touchstart", startPress, { passive: true });
         el.addEventListener("touchend", cancelPress);
         el.addEventListener("touchcancel", cancelPress);
@@ -810,7 +815,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // --- 8. Unified Custom Item Binding ---
-    let universalPressTimer;
+    let universalPressTimer = null;
     let uStartX = 0, uStartY = 0;
 
     function bindCustomItems() {
@@ -823,6 +828,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     uStartX = e.touches[0].clientX;
                     uStartY = e.touches[0].clientY;
                 }
+                if (universalPressTimer) {
+                    clearTimeout(universalPressTimer);
+                }
+                
                 universalPressTimer = setTimeout(() => {
                     const cat = el.getAttribute("data-cat");
                     const idx = parseInt(el.getAttribute("data-idx"));
@@ -830,26 +839,31 @@ document.addEventListener("DOMContentLoaded", () => {
                         closeInventoryModal();
                     }
                     openAddItemModal(cat, idx);
+                    universalPressTimer = null;
                 }, 500); 
             };
             
-            const cancelPress = () => { clearTimeout(universalPressTimer); };
+            const cancelPress = () => { 
+                if (universalPressTimer) {
+                    clearTimeout(universalPressTimer);
+                    universalPressTimer = null;
+                }
+            };
 
             const checkMove = (e) => {
                 if (!universalPressTimer) return;
                 if (e.touches && e.touches.length > 0) {
                     const dx = Math.abs(e.touches[0].clientX - uStartX);
                     const dy = Math.abs(e.touches[0].clientY - uStartY);
-                    if (dx > 10 || dy > 10) cancelPress();
+                    if (dx > 10 || dy > 10) {
+                        cancelPress();
+                    }
                 } else {
                     cancelPress();
                 }
             };
 
-            el.addEventListener("mousedown", startPress);
-            el.addEventListener("mouseup", cancelPress);
-            el.addEventListener("mouseleave", cancelPress);
-
+            // NUR NOCH TOUCH EVENTS - Maus-Steuerung komplett entfernt!
             el.addEventListener("touchstart", startPress, { passive: true });
             el.addEventListener("touchend", cancelPress);
             el.addEventListener("touchcancel", cancelPress);
