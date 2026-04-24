@@ -192,6 +192,12 @@ body {
   transition: color 0.2s;
 }
 
+.long-press-edit, .custom-item-bind {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 .long-press-edit:active {
   color: var(--accent-gold);
 }

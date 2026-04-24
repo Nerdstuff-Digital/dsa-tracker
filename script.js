@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
         openSections: ["Personendaten", "Eigenschaften & Basiswerte", "Talente"]
     };
 
-    
+
     // Merge logic
     const charData = { ...defaultData, ...savedData };
     if (!savedData.coreText) charData.coreText = defaultData.coreText;
@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // --- 4. Long Press Edit Logic ---
+// --- 4. Long Press Edit Logic ---
     let longPressTimer;
     document.querySelectorAll(".long-press-edit").forEach(el => {
         const textKey = el.getAttribute("data-stat-text");
@@ -377,20 +377,26 @@ document.addEventListener("DOMContentLoaded", () => {
         function startPress(e) {
             longPressTimer = setTimeout(() => {
                 openTextEditModal(textKey, charData.coreText[textKey]);
-            }, 1000); // 1.0s to avoid being too tedious, user requested 1.5s but 1.0s is usually better on phone. I'll stick to 1.5s as requested.
+            }, 600); 
         }
         function cancelPress(e) {
             clearTimeout(longPressTimer);
         }
 
-        el.addEventListener("mousedown", (e) => { startPress(e); });
-        el.addEventListener("touchstart", (e) => { startPress(e); });
-        
+        // Maus-Events (für PC)
+        el.addEventListener("mousedown", startPress);
         el.addEventListener("mouseup", cancelPress);
         el.addEventListener("mouseleave", cancelPress);
+
+        // Touch-Events (fürs Tablet)
+        el.addEventListener("touchstart", startPress, { passive: true });
         el.addEventListener("touchend", cancelPress);
-        el.addEventListener("touchmove", cancelPress);
+        el.addEventListener("touchcancel", cancelPress);
+        
+        // Verhindert das Standard-Menü des Tablets
+        el.addEventListener("contextmenu", (e) => { e.preventDefault(); });
     });
+
 
     // --- 5. Calculators ---
     function updateProbes() {
@@ -787,9 +793,13 @@ document.addEventListener("DOMContentLoaded", () => {
         openInventoryModal();
     };
 
-    let universalPressTimer;
+let universalPressTimer;
     function bindCustomItems() {
         document.querySelectorAll(".custom-item-bind").forEach(el => {
+            // Verhindert, dass die Events mehrfach auf dasselbe Element gelegt werden
+            if (el.dataset.boundTouch === "true") return;
+            el.dataset.boundTouch = "true";
+
             const startPress = (e) => {
                 universalPressTimer = setTimeout(() => {
                     const cat = el.getAttribute("data-cat");
@@ -802,29 +812,18 @@ document.addEventListener("DOMContentLoaded", () => {
             };
             const cancelPress = () => { clearTimeout(universalPressTimer); };
 
+            el.addEventListener("mousedown", startPress);
+            el.addEventListener("mouseup", cancelPress);
+            el.addEventListener("mouseleave", cancelPress);
+
             el.addEventListener("touchstart", startPress, { passive: true });
             el.addEventListener("touchend", cancelPress);
             el.addEventListener("touchcancel", cancelPress);
-            el.addEventListener("touchmove", cancelPress, { passive: true });
+            
+            el.addEventListener("contextmenu", (e) => { e.preventDefault(); });
         });
     }
 
-    // Fix for 1.5s exactly on longpress 
-    document.querySelectorAll(".long-press-edit").forEach(el => {
-        // Redefine precisely
-        const textKey = el.getAttribute("data-stat-text");
-        const startPress = (e) => {
-            longPressTimer = setTimeout(() => {
-                openTextEditModal(textKey, charData.coreText[textKey]);
-            }, 600); 
-        };
-        const cancelPress = () => { clearTimeout(longPressTimer); };
-        
-        el.addEventListener("touchstart", startPress, { passive: true });
-        el.addEventListener("touchend", cancelPress);
-        el.addEventListener("touchcancel", cancelPress);
-        el.addEventListener("touchmove", cancelPress, { passive: true });
-    });
 
     // --- State Persistence for <details> Tags ---
     document.querySelectorAll("details.section-card").forEach(details => {
