@@ -3,17 +3,17 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- 1. Data load from localStorage ---
     const savedData = JSON.parse(localStorage.getItem("dsa_char_data")) || {};
     
-    // Default values representing "Ruslan" as per original HTML
+// Default values representing "Ruslan"
     const defaultData = {
         "Stufe": 0,
-        "AP_Gesamt": 420,
-        "AP_eingesetzt": 297,
-        "CH": 11, "FF": 14, "GE": 12, "GS": 8, "IN": 13, "KK": 16, "KL": 8, "KO": 15, "MU": 15,
-        "LE": 34, "AU": 33, "AE": 32, "MR": 5, "INI": 11, "AT_Basis": 9, "PA_Basis": 8, "FK_Basis": 9,
+        "AP_Gesamt": 620,
+        "AP_eingesetzt": 459,
+        "CH": 11, "FF": 14, "GE": 12, "GS": 6, "IN": 13, "KK": 16, "KL": 8, "KO": 15, "MU": 15,
+        "LE": 34, "AU": 33, "AE": 22, "MR": 5, "INI": 11, "AT_Basis": 9, "PA_Basis": 8, "FK_Basis": 9,
         "BE": 0,
         geld: { gold: 0, silber: 0, heller: 0 },
         coreText: {
-            "Name": "Ruslan (Kopie)",
+            "Name": "Ruslan",
             "Rasse": "Thorwaler",
             "Kultur": "Thorwal",
             "Profession": "Seefahrer, Pirat"
@@ -22,27 +22,40 @@ document.addEventListener("DOMContentLoaded", () => {
             "eigenschaften": [],
             "basiswerte": [],
             "talent_gabe": [
-                { name: "Magiegespür", probe: "(MU/IN/IN)", taw: 3 }
+                { name: "Magiegespür", probe: "(MU/IN/IN)", taw: 4 }
             ],
             "kampftechniken": [
                 { name: "Dolche", be: "BE-1", at: 11, pa: 8, taw: 2 },
                 { name: "Hiebwaffen", be: "BE-4", at: 12, pa: 10, taw: 5 },
                 { name: "Raufen", be: "BE", at: 13, pa: 9, taw: 5 },
+                { name: "Ringen", be: "BE", at: 9, pa: 8, taw: 0 },
+                { name: "Säbel", be: "BE-2", at: 11, pa: 8, taw: 2 },
                 { name: "Schwerter", be: "BE-2", at: 13, pa: 11, taw: 7 },
-                { name: "Wurfmesser", be: "BE-3", at: 12, pa: 0, taw: 3 }
+                { name: "Wurfbeile", be: "BE-2", at: 11, pa: 0, taw: 2 },
+                { name: "Wurfmesser", be: "BE-3", at: 12, pa: 0, taw: 3 },
+                { name: "Wurfspeere", be: "BE-2", at: 11, pa: 0, taw: 2 }
             ],
             "talent_koerper": [
                 { name: "Akrobatik", probe: "(MU/GE/KK)", taw: 2 },
                 { name: "Athletik", probe: "(GE/KO/KK)", taw: 4 },
                 { name: "Klettern", probe: "(MU/GE/KK)", taw: 4 },
                 { name: "Körperbeherrschung", probe: "(MU/IN/GE)", taw: 5 },
+                { name: "Schleichen", probe: "(MU/IN/GE)", taw: 0 },
                 { name: "Schwimmen", probe: "(GE/KO/KK)", taw: 6 },
+                { name: "Selbstbeherrschung", probe: "(MU/KO/KK)", taw: 5 },
+                { name: "Sich verstecken", probe: "(MU/IN/GE)", taw: 0 },
+                { name: "Singen", probe: "(IN/CH/CH)", taw: 0 },
+                { name: "Sinnenschärfe", probe: "(KL/IN/IN)", taw: 1 },
+                { name: "Tanzen", probe: "(CH/GE/GE)", taw: 0 },
                 { name: "Zechen", probe: "(IN/KO/KK)", taw: 7 }
             ],
             "talent_gesellschaft": [
+                { name: "Gassenwissen", probe: "(KL/IN/CH)", taw: 1 },
+                { name: "Menschenkenntnis", probe: "(KL/IN/CH)", taw: 1 },
                 { name: "Überreden", probe: "(MU/IN/CH)", taw: 5 }
             ],
             "talent_natur": [
+                { name: "Fährtensuchen", probe: "(KL/IN/KO)", taw: 3 },
                 { name: "Fesseln/Entfesseln", probe: "(FF/GE/KK)", taw: 4 },
                 { name: "Fischen/Angeln", probe: "(IN/FF/KK)", taw: 6 },
                 { name: "Orientierung", probe: "(KL/IN/IN)", taw: 5 },
@@ -51,22 +64,32 @@ document.addEventListener("DOMContentLoaded", () => {
             ],
             "talent_wissen": [
                 { name: "Geografie", probe: "(KL/KL/IN)", taw: 2 },
-                { name: "Sagen und Legenden", probe: "(KL/IN/CH)", taw: 5 }
+                { name: "Götter und Kulte", probe: "(KL/KL/IN)", taw: 1 },
+                { name: "Kriegskunst", probe: "(MU/KL/CH)", taw: 2 },
+                { name: "Rechnen", probe: "(KL/KL/IN)", taw: 0 },
+                { name: "Sagen und Legenden", probe: "(KL/IN/CH)", taw: 5 },
+                { name: "Schätzen", probe: "(KL/IN/IN)", taw: 2 },
+                { name: "Sternkunde", probe: "(KL/KL/IN)", taw: 1 }
             ],
             "talent_sprachen": [
                 { name: "Garethi", probe: "18", taw: 4 },
                 { name: "Isdira", probe: "21", taw: 4 },
-                { name: "Thorwalsch", probe: "18", taw: 6 }
+                { name: "Thorwalsch", probe: "18", taw: 6 },
+                { name: "Kusliker Zeichen (Schrift)", probe: "10", taw: 0 }
             ],
             "talent_handwerk": [
                 { name: "Boote fahren", probe: "(GE/KO/KK)", taw: 6 },
+                { name: "Heilkunde: Wunden", probe: "(KL/CH/FF)", taw: 1 },
                 { name: "Holzbearbeitung", probe: "(KL/FF/KK)", taw: 3 },
+                { name: "Kochen", probe: "(KL/IN/FF)", taw: 0 },
+                { name: "Lederarbeiten", probe: "(KL/FF/FF)", taw: 2 },
+                { name: "Malen/Zeichnen", probe: "(KL/IN/FF)", taw: 0 },
                 { name: "Schneidern", probe: "(KL/FF/FF)", taw: 6 },
                 { name: "Seefahrt", probe: "(FF/GE/KK)", taw: 6 }
             ],
             "zauber": [
-                { name: "Ignifaxius Flammenstrahl", probe: "(KL/FF/KO)", zfw: 0, rep: "Magier<br>Elem (Feu), Scha" },
-                { name: "Ignisphaero Feuerball", probe: "(MU/IN/KO)", zfw: 0, rep: "Magier<br>Elem (Feu), Scha, Tele" },
+                { name: "Ignifaxius Flammenstrahl", probe: "(KL/FF/KO)", zfw: 4, rep: "Magier<br>Elem (Feu), Scha" },
+                { name: "Ignisphaero Feuerball", probe: "(MU/IN/KO)", zfw: 6, rep: "Magier<br>Elem (Feu), Scha, Tele" },
                 { name: "Juckreiz, dämlicher!", probe: "(MU/IN/CH)", zfw: 0, rep: "Magier<br>Einfl" }
             ],
             "vorteile": [
@@ -86,19 +109,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 { name: "Standfest" }
             ],
             "ausruestung": [
-                { id: "A1", name: "Langschwert: 1W6 +4", be: 0 },
-                { id: "A2", name: "Lederharnisch", be: -1, rs: 3 }
+                { id: "A1", name: "(Lang-)Schwert: 1W6+4", be: 0 },
+                { id: "A2", name: "Lederharnisch", be: 2, rs: 2 }
             ],
             "gegenstaende": [
-                { id: "I1", amount: 1, name: "Brett- und Kartenspiel" },
-                { id: "I2", amount: 1, name: "Zinnkrug" },
-                { id: "I3", amount: 1, name: "Brosche" },
-                { id: "I4", amount: 1, name: "Angelhaken" }
+                { id: "I1", amount: 1, name: "Wurfmesser" }
             ]
         },
         openSections: ["Personendaten", "Eigenschaften & Basiswerte", "Talente"]
     };
 
+    
     // Merge logic
     const charData = { ...defaultData, ...savedData };
     if (!savedData.coreText) charData.coreText = defaultData.coreText;
