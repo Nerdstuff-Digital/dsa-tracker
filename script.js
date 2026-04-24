@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- 1. Data load from localStorage ---
     const savedData = JSON.parse(localStorage.getItem("dsa_char_data")) || {};
     
-// Default values representing "Ruslan"
+    // Default values representing "Ruslan"
     const defaultData = {
         "Stufe": 0,
         "AP_Gesamt": 620,
@@ -119,7 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
         openSections: ["Personendaten", "Eigenschaften & Basiswerte", "Talente"]
     };
 
-
     // Merge logic
     const charData = { ...defaultData, ...savedData };
     if (!savedData.coreText) charData.coreText = defaultData.coreText;
@@ -135,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
     else {
         charData.customList = { ...defaultData.customList, ...savedData.customList };
         
-        // MIGRATION: Populate defaults if array is empty (for already initialized caches)
+        // MIGRATION
         const catsCheck = ["talent_gabe", "kampftechniken", "talent_koerper", "talent_gesellschaft", "talent_natur", "talent_wissen", "talent_sprachen", "talent_handwerk", "zauber", "vorteile", "nachteile", "sonderfertigkeiten"];
         catsCheck.forEach(cat => {
             if (!savedData.customList[cat] || savedData.customList[cat].length === 0) {
@@ -171,17 +170,17 @@ document.addEventListener("DOMContentLoaded", () => {
         ["eigenschaften", "basiswerte"].forEach(cat => {
             const container = document.getElementById(`custom-${cat}`);
             if (!container) return;
-            charData.customList[cat].forEach(item => {
-                // Register stat if new
+            let htmlString = "";
+            charData.customList[cat].forEach((item, index) => {
                 if (charData[item.id] === undefined) charData[item.id] = parseInt(item.wert) || 0;
-                
-                container.innerHTML += `
+                htmlString += `
                     <div class="data-row custom-item-bind" data-cat="${cat}" data-idx="${index}">
                         <span class="data-label">${item.name}</span>
                         <div class="editable custom-editable" data-stat-id="${item.id}"></div>
                     </div>
                 `;
             });
+            container.innerHTML = htmlString;
         });
 
         // Render Talente
@@ -189,8 +188,9 @@ document.addEventListener("DOMContentLoaded", () => {
         talentCats.forEach(cat => {
             const container = document.getElementById(`custom-${cat}`);
             if (!container) return;
+            let htmlString = "";
             charData.customList[cat].forEach((item, index) => {
-                container.innerHTML += `
+                htmlString += `
                     <div class="talent-row custom-item-bind" data-cat="${cat}" data-idx="${index}">
                         <span class="talent-name">${item.name}</span>
                         <div class="talent-probe">
@@ -201,13 +201,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                 `;
             });
+            container.innerHTML = htmlString;
         });
 
         // Render Kampftechniken
         const kampfc = document.getElementById("custom-kampftechniken");
         if (kampfc) {
+            let htmlString = "";
             charData.customList["kampftechniken"].forEach((item, index) => {
-                kampfc.innerHTML += `
+                htmlString += `
                     <div class="talent-row kampf-row custom-item-bind" data-cat="kampftechniken" data-idx="${index}">
                         <span class="talent-name">${item.name}</span>
                         <div class="talent-probe"><span>${item.be}</span><div class="formula-calc" data-formula="${item.be}"></div></div>
@@ -215,13 +217,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                 `;
             });
+            kampfc.innerHTML = htmlString;
         }
 
         // Render Zauber
         const zauberC = document.getElementById("custom-zauber-container");
         if (zauberC) {
+            let htmlString = "";
             charData.customList["zauber"].forEach((item, index) => {
-                zauberC.innerHTML += `
+                htmlString += `
                     <tr class="custom-item-bind" data-cat="zauber" data-idx="${index}">
                         <td><strong>${item.name}</strong></td>
                         <td>
@@ -234,31 +238,32 @@ document.addEventListener("DOMContentLoaded", () => {
                     </tr>
                 `;
             });
+            zauberC.innerHTML = htmlString;
         }
 
         // Render Simple Lists
         ["vorteile", "nachteile", "sonderfertigkeiten"].forEach(cat => {
              const container = document.getElementById(`custom-${cat}-container`);
              if (!container) return;
+             let htmlString = "";
              charData.customList[cat].forEach((item, index) => {
-                 container.innerHTML += `
+                 htmlString += `
                     <div class="data-row custom-item-bind" data-cat="${cat}" data-idx="${index}" style="cursor:pointer; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 0; display:flex;">
                         <span class="data-label" style="color:var(--text-secondary); width:100%">${item.name}</span>
                     </div>
                  `;
              });
+             container.innerHTML = htmlString;
         });
 
-        setupEditables(); // re-bind editables logic for new elements
+        setupEditables(); 
         bindCustomItems();
     }
 
     function updateDOM() {
-        // Text stats from coreText
         document.querySelectorAll(".long-press-edit").forEach(el => {
             const statId = el.getAttribute("data-stat-text");
             if (charData.coreText[statId] !== undefined) {
-                // If it's an H1 container, update inner H1, otherwise data-value
                 const innerH1 = el.querySelector("h1");
                 const dataVal = el.querySelector(".data-value");
                 if (innerH1) innerH1.innerText = charData.coreText[statId];
@@ -267,7 +272,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // Loop over active editables to update UI inner HTML without losing focus if possible
         document.querySelectorAll(".editable").forEach(el => {
             const statId = el.getAttribute("data-stat-id");
             if (statId && charData[statId] !== undefined) {
@@ -276,7 +280,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // Update AP displays
         const apGesamtEl = document.getElementById("disp-ap-gesamt");
         if (apGesamtEl) apGesamtEl.innerText = charData["AP_Gesamt"] || 0;
         
@@ -302,7 +305,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- 3. Interactive Edit Logic ---
     function setupEditables() {
         document.querySelectorAll(".editable:not(.bound)").forEach(wrapper => {
-            wrapper.classList.add("bound"); // Prevent duplicate binding
+            wrapper.classList.add("bound");
             const statId = wrapper.getAttribute("data-stat-id");
             if (!statId) return;
 
@@ -328,7 +331,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!wrapper.classList.contains("active")) {
                     document.querySelectorAll(".editable.active").forEach(el => el.classList.remove("active"));
                     wrapper.classList.add("active");
-                    // No input.focus(); here, to prevent keyboard popup on first click.
                 }
             });
 
@@ -369,40 +371,56 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-// --- 4. Long Press Edit Logic ---
+    // --- 4. Long Press Edit Logic ---
     let longPressTimer;
+    let startX = 0, startY = 0; // Toleranz-Speicher
+
     document.querySelectorAll(".long-press-edit").forEach(el => {
         const textKey = el.getAttribute("data-stat-text");
         
         function startPress(e) {
+            if (e.touches && e.touches.length > 0) {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            }
             longPressTimer = setTimeout(() => {
                 openTextEditModal(textKey, charData.coreText[textKey]);
-            }, 600); 
+            }, 500); 
         }
-        function cancelPress(e) {
+        
+        function cancelPress() {
             clearTimeout(longPressTimer);
         }
 
-        // Maus-Events (für PC)
+        function checkMove(e) {
+            if (!longPressTimer) return;
+            if (e.touches && e.touches.length > 0) {
+                const dx = Math.abs(e.touches[0].clientX - startX);
+                const dy = Math.abs(e.touches[0].clientY - startY);
+                // Erst abbrechen, wenn weiter als 10 Pixel gescrollt wird
+                if (dx > 10 || dy > 10) cancelPress();
+            } else {
+                cancelPress();
+            }
+        }
+
         el.addEventListener("mousedown", startPress);
         el.addEventListener("mouseup", cancelPress);
         el.addEventListener("mouseleave", cancelPress);
 
-        // Touch-Events (fürs Tablet)
         el.addEventListener("touchstart", startPress, { passive: true });
         el.addEventListener("touchend", cancelPress);
         el.addEventListener("touchcancel", cancelPress);
-        // CRITICAL FIX: Auch hier beim Scrollen abbrechen!
-        el.addEventListener("touchmove", cancelPress, { passive: true });
+        el.addEventListener("touchmove", checkMove, { passive: true });
         
-        // Verhindert das Standard-Menü des Tablets
         el.addEventListener("contextmenu", (e) => { e.preventDefault(); });
     });
+
 
     // --- 5. Calculators ---
     function updateProbes() {
         document.querySelectorAll(".probe-calc").forEach(el => {
-            const probeStr = el.getAttribute("data-probe"); // (MU/IN/CH)
+            const probeStr = el.getAttribute("data-probe"); 
             if (!probeStr || !probeStr.includes("/")) return;
             
             const parts = probeStr.replace(/[()]/g, "").split("/");
@@ -427,7 +445,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const eingesetzt = parseInt(charData["AP_eingesetzt"]) || 0;
                 result = `${gesamt - eingesetzt}`;
                 el.innerHTML = result;
-                return; // Early return for this specific style
+                return; 
             } else if (formulaStr.includes("x")) {
                 const mult = parseInt(formulaStr.split("x")[1]) || 1;
                 result = `${beVal} * ${mult} = ${beVal * mult}`;
@@ -455,7 +473,7 @@ document.addEventListener("DOMContentLoaded", () => {
         modalContainer.innerHTML = "";
     }
 
-    window.closeModals = closeModals; // global helper
+    window.closeModals = closeModals; 
 
     window.cancelAddItem = function(category) {
         closeModals();
@@ -525,7 +543,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Handling '+' buttons
     document.querySelectorAll(".add-btn").forEach(btn => {
         btn.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -639,8 +656,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 newItem.probe = document.getElementById("add-probe").value || "(MU/KL/IN)";
                 newItem.taw = document.getElementById("add-value").value || 0;
                 if(isZauber) {
-                    newItem.zfw = newItem.taw; // Map TAW to ZfW for UI
-                    newItem.rep = newItem.rep || "-"; // Default representation
+                    newItem.zfw = newItem.taw;
+                    newItem.rep = newItem.rep || "-";
                 }
             } else if (needsWert) {
                 if(!isEdit) newItem.id = "CUSTOM_" + Math.random().toString(36).substr(2, 5).toUpperCase();
@@ -675,7 +692,6 @@ document.addEventListener("DOMContentLoaded", () => {
             
             saveData();
             
-            // Re-render
             renderCustomLists();
             calculateBE();
             updateDOM();
@@ -689,7 +705,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- 7. Inventory Modal Logic ---
     window.openInventoryModal = function() {
         const invData = charData.customList;
-        const geld = charData.geld;
         
         let ausrHTML = invData.ausruestung.map((item, idx) => {
             let stats = [];
@@ -783,7 +798,7 @@ document.addEventListener("DOMContentLoaded", () => {
         saveData();
         calculateBE();
         updateDOM();
-        openInventoryModal(); // refresh
+        openInventoryModal(); 
     };
 
     window.changeItemAmount = function(e, idx, delta) {
@@ -794,14 +809,20 @@ document.addEventListener("DOMContentLoaded", () => {
         openInventoryModal();
     };
 
-let universalPressTimer;
+    // --- 8. Unified Custom Item Binding ---
+    let universalPressTimer;
+    let uStartX = 0, uStartY = 0;
+
     function bindCustomItems() {
         document.querySelectorAll(".custom-item-bind").forEach(el => {
-            // Verhindert, dass die Events mehrfach auf dasselbe Element gelegt werden
             if (el.dataset.boundTouch === "true") return;
             el.dataset.boundTouch = "true";
 
             const startPress = (e) => {
+                if (e.touches && e.touches.length > 0) {
+                    uStartX = e.touches[0].clientX;
+                    uStartY = e.touches[0].clientY;
+                }
                 universalPressTimer = setTimeout(() => {
                     const cat = el.getAttribute("data-cat");
                     const idx = parseInt(el.getAttribute("data-idx"));
@@ -809,9 +830,21 @@ let universalPressTimer;
                         closeInventoryModal();
                     }
                     openAddItemModal(cat, idx);
-                }, 500); // Leicht auf 500ms verkürzt, fühlt sich knackiger an
+                }, 500); 
             };
+            
             const cancelPress = () => { clearTimeout(universalPressTimer); };
+
+            const checkMove = (e) => {
+                if (!universalPressTimer) return;
+                if (e.touches && e.touches.length > 0) {
+                    const dx = Math.abs(e.touches[0].clientX - uStartX);
+                    const dy = Math.abs(e.touches[0].clientY - uStartY);
+                    if (dx > 10 || dy > 10) cancelPress();
+                } else {
+                    cancelPress();
+                }
+            };
 
             el.addEventListener("mousedown", startPress);
             el.addEventListener("mouseup", cancelPress);
@@ -820,13 +853,13 @@ let universalPressTimer;
             el.addEventListener("touchstart", startPress, { passive: true });
             el.addEventListener("touchend", cancelPress);
             el.addEventListener("touchcancel", cancelPress);
-            // CRITICAL FIX: Wenn gescrollt wird, sofort Timer abbrechen!
-            el.addEventListener("touchmove", cancelPress, { passive: true }); 
+            el.addEventListener("touchmove", checkMove, { passive: true }); 
             
             el.addEventListener("contextmenu", (e) => { e.preventDefault(); });
         });
     }
 
+    
     // --- State Persistence for <details> Tags ---
     document.querySelectorAll("details.section-card").forEach(details => {
         const h2Info = details.querySelector("h2");
