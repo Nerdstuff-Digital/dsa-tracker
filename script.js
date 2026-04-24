@@ -814,6 +814,27 @@ document.addEventListener("DOMContentLoaded", () => {
         openInventoryModal();
     };
 
+
+    // --- 9. Portrait Modal Logic ---
+    window.openPortraitModal = function() {
+        // Wir nutzen bequem den bestehenden Container der Truhe
+        document.getElementById("inventory-modal-container").innerHTML = `
+            <div class="modal-overlay active" style="z-index: 950; display:flex;">
+                <div class="inventory-card modal-card portrait-card" style="margin: auto;">
+                    <div class="inventory-header">
+                        <h2>Ruslan</h2>
+                        <button class="close-btn" onclick="closeInventoryModal()">&#x2715;</button>
+                    </div>
+                    <div class="inventory-content" style="padding: 0;">
+                        <div class="portrait-img-container">
+                            <img src="img/Gemini_Generated_Image_h7qmbch7qmbch7qm (1).png" alt="Ruslan Portrait">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+
     // --- 8. Unified Custom Item Binding ---
     let universalPressTimer = null;
     let uStartX = 0, uStartY = 0;
