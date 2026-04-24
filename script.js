@@ -690,13 +690,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const invData = charData.customList;
         const geld = charData.geld;
         
-        let ausrHTML = invData.ausruestung.map((item, idx) => {
+let ausrHTML = invData.ausruestung.map((item, idx) => {
             let stats = [];
             if(item.rs) stats.push(`RS: ${item.rs}`);
             if(item.be) stats.push(`BE: ${item.be}`);
             let statText = stats.length > 0 ? `<span style="font-size:0.7rem; color:var(--text-secondary); margin-left:5px;">(${stats.join(' | ')})</span>` : '';
             return `
-            <div class="inv-row custom-item-bind" data-cat="ausruestung" data-idx="${idx}">
+            <div class="inv-row" style="cursor:pointer;" onclick="closeInventoryModal(); openAddItemModal('ausruestung', ${idx});">
                 <div style="flex:1;">
                     <strong>${item.name}</strong>
                     ${statText}
@@ -705,7 +705,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }).join('');
 
         let gegHTML = invData.gegenstaende.map((item, idx) => `
-            <div class="inv-row custom-item-bind" data-cat="gegenstaende" data-idx="${idx}">
+            <div class="inv-row" style="cursor:pointer;" onclick="closeInventoryModal(); openAddItemModal('gegenstaende', ${idx});">
                 <div style="flex:1;">
                     <span style="color:var(--accent-gold); margin-right:5px;">${item.amount}x</span> 
                     <strong>${item.name}</strong>
@@ -713,6 +713,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
         `).join('');
 
+        
         document.getElementById("inventory-modal-container").innerHTML = `
             <div class="modal-overlay active" style="z-index: 950; display:flex;">
                 <div class="inventory-card modal-card" style="margin: auto; max-height: 85vh;">
